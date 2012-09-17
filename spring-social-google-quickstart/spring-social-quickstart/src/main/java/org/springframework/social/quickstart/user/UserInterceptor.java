@@ -25,7 +25,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * Before a request is handled:
- * 1. sets the current User in the {@link SecurityContext} from a cookie, if present and the user is still connected to Facebook.
+ * 1. sets the current User in the {@link SecurityContext} from a cookie, if present and the user is still connected to Google.
  * 2. requires that the user sign-in if he or she hasn't already.
  * @author Keith Donald
  */
@@ -69,7 +69,7 @@ public final class UserInterceptor extends HandlerInterceptorAdapter {
 
 	private void handleSignOut(HttpServletRequest request, HttpServletResponse response) {
 		if (SecurityContext.userSignedIn() && request.getServletPath().startsWith("/signout")) {
-			connectionRepository.createConnectionRepository(SecurityContext.getCurrentUser().getId()).removeConnections("facebook");
+			connectionRepository.createConnectionRepository(SecurityContext.getCurrentUser().getId()).removeConnections("google");
 			userCookieGenerator.removeCookie(response);
 			SecurityContext.remove();			
 		}
@@ -85,7 +85,7 @@ public final class UserInterceptor extends HandlerInterceptorAdapter {
 	}
 
 	private boolean userNotFound(String userId) {
-		// doesn't bother checking a local user database: simply checks if the userId is connected to Facebook
+		// doesn't bother checking a local user database: simply checks if the userId is connected to Google
 		return connectionRepository.createConnectionRepository(userId).findPrimaryConnection(Google.class) != null;
 	}
 	

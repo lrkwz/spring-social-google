@@ -41,6 +41,7 @@ import org.springframework.social.quickstart.user.User;
 
 /**
  * Spring Social Configuration.
+ * 
  * @author Keith Donald
  */
 @Configuration
@@ -53,55 +54,66 @@ public class SocialConfig {
 	private DataSource dataSource;
 
 	/**
-	 * When a new provider is added to the app, register its {@link ConnectionFactory} here.
-	 * @see FacebookConnectionFactory
+	 * When a new provider is added to the app, register its
+	 * {@link ConnectionFactory} here.
+	 * 
+	 * @see GoogleConnectionFactory
 	 */
 	@Bean
 	public ConnectionFactoryLocator connectionFactoryLocator() {
 		ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
-		registry.addConnectionFactory(new GoogleConnectionFactory(environment.getProperty("google.clientId"),
-				environment.getProperty("google.clientSecret")));
+		registry.addConnectionFactory(new GoogleConnectionFactory(environment
+				.getProperty("google.clientId"), environment
+				.getProperty("google.clientSecret")));
 		return registry;
 	}
 
 	/**
-	 * Singleton data access object providing access to connections across all users.
+	 * Singleton data access object providing access to connections across all
+	 * users.
 	 */
 	@Bean
 	public UsersConnectionRepository usersConnectionRepository() {
-		JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource,
-				connectionFactoryLocator(), Encryptors.noOpText());
+		JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(
+				dataSource, connectionFactoryLocator(), Encryptors.noOpText());
 		repository.setConnectionSignUp(new SimpleConnectionSignUp());
 		return repository;
 	}
 
 	/**
-	 * Request-scoped data access object providing access to the current user's connections.
+	 * Request-scoped data access object providing access to the current user's
+	 * connections.
 	 */
 	@Bean
-	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)
+	@Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
 	public ConnectionRepository connectionRepository() {
-	    User user = SecurityContext.getCurrentUser();
-	    return usersConnectionRepository().createConnectionRepository(user.getId());
+		User user = SecurityContext.getCurrentUser();
+		return usersConnectionRepository().createConnectionRepository(
+				user.getId());
 	}
 
 	/**
-	 * A proxy to a request-scoped object representing the current user's primary Facebook account.
-	 * @throws NotConnectedException if the user is not connected to facebook.
+	 * A proxy to a request-scoped object representing the current user's
+	 * primary Google account.
+	 * 
+	 * @throws NotConnectedException
+	 *             if the user is not connected to google.
 	 */
 	@Bean
-	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
+	@Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
 	public Google google() {
-	    return connectionRepository().getPrimaryConnection(Google.class).getApi();
+		return connectionRepository().getPrimaryConnection(Google.class)
+				.getApi();
 	}
-	
+
 	/**
-	 * The Spring MVC Controller that allows users to sign-in with their provider accounts.
+	 * The Spring MVC Controller that allows users to sign-in with their
+	 * provider accounts.
 	 */
 	@Bean
 	public ProviderSignInController providerSignInController() {
-		return new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
-				new SimpleSignInAdapter());
+		return new ProviderSignInController(connectionFactoryLocator(),
+				usersConnectionRepository(), new SimpleSignInAdapter());
 	}
 
 }

@@ -7,3 +7,5 @@ $ mvn tomcat:run
 Access the project at http://localhost:8080/spring-social-quickstart
 
 Discuss at forum.springsource.org and collaborate with the development team at jira.springframework.org/browse/SOCIAL.
+
+If you use this sample as boilercode for your application do not forget to generate your own API access tokens.
